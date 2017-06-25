@@ -46,7 +46,8 @@
             this.ClientSize = new System.Drawing.Size(296, 323);
             this.Controls.Add(this.mainUserControl1);
             this.Name = "Form1";
-            this.Text = "Code To UML";
+            this.Text = "C# To PlantUML";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
 
         }

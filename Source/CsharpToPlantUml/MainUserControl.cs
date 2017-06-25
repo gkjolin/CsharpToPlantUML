@@ -18,6 +18,14 @@ namespace CodeToUml
             InitializeComponent();
         }
 
+        public void OnLoad()
+        {
+            // コントロールを、フォームに合わせて広げます
+            textBox1.SetBounds(0, textBox1.Bounds.Y, Width, textBox1.Height);
+            translationButton.SetBounds(0, translationButton.Bounds.Y, Width, translationButton.Height);
+            textBox2.SetBounds(0, textBox2.Bounds.Y, Width, textBox2.Height);
+        }
+
         /// <summary>
         /// ダンプ
         /// </summary>
@@ -60,6 +68,123 @@ namespace CodeToUml
         const string NEWLINE = "\n";
 
         /// <summary>
+        /// 字句解析1
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        static string[] LexicalParse1(string text)
+        {
+            return text.Split(' ');
+        }
+
+        static void FlushWord(StringBuilder word, List<string> tokens2)
+        {
+            if (0 < word.Length) { tokens2.Add(word.ToString()); word.Clear(); }
+        }
+        /// <summary>
+        /// 字句解析2
+        /// </summary>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        static List<string> LexicalParse2(string[] tokens)
+        {
+            StringBuilder word = new StringBuilder();
+
+            List<string> tokens2 = new List<string>();
+            foreach (string token in tokens)
+            {
+                int caret = 0;
+                while (caret< token.Length)
+                {
+                    switch (token[caret])
+                    {
+                        case '\r':
+                            {
+                                if (caret+1 < token.Length && '\n' ==token[caret+1])
+                                {
+                                    // 改行
+                                    FlushWord(word, tokens2);
+                                    tokens2.Add(NEWLINE);// 改行は'\n'１つに変換
+                                    caret+=2;
+                                }
+                                else
+                                {
+                                    word.Append(token[caret]);
+                                    caret++;
+                                }
+                            }
+                            break;
+                        case ';':
+                            {
+                                FlushWord(word, tokens2);
+                                tokens2.Add(token[caret].ToString());// セミコロンは分ける
+                                caret++;
+                            }
+                            break;
+                        case '/':
+                            {
+                                if (caret + 1 < token.Length && '/' == token[caret + 1])
+                                {
+                                    if (caret + 2 < token.Length && '/' == token[caret + 2])
+                                    {
+                                        // 「///」
+                                        FlushWord(word, tokens2);
+                                        tokens2.Add("///");
+                                        caret+=3;
+                                    }
+                                    else
+                                    {
+                                        // 「//」
+                                        FlushWord(word, tokens2);
+                                        tokens2.Add("//");
+                                        caret+=2;
+                                    }
+                                }
+                                else
+                                {
+                                    word.Append(token[caret]);
+                                    caret++;
+                                }
+                            }
+                            break;
+                        default:
+                            word.Append(token[caret]);
+                            caret++;
+                            break;
+                    }
+                }
+
+                FlushWord(word, tokens2);
+            }
+
+            return tokens2;
+        }
+
+        /// <summary>
+        /// 字句解析3
+        /// </summary>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        static List<string> LexicalParse3(List<string> tokens)
+        {
+            // 空文字列を除去
+            List<string> tokens2 = new List<string>();
+            foreach (string token in tokens)
+            {
+                if ("" == token)
+                {
+                    // 空文字列は無視
+                }
+                else
+                {
+                    tokens2.Add(token);
+                }
+            }
+
+            return tokens2;
+        }
+
+        /// <summary>
         /// [変換]ボタンクリック
         /// </summary>
         /// <param name="sender"></param>
@@ -72,94 +197,58 @@ namespace CodeToUml
             // static Score score_cache;
 
             #region レキサー
-            string[] tokens = textBox1.Text.Split(' ');
-
-            // ダンプ
-            Dump(tokens);
-
-            List<string> tokens2 = new List<string>();
-            foreach (string token in tokens)
+            List<string> tokens;
             {
-                if (""==token)
-                {
-                    // 空文字列は無視
-                }
-                else if (token.Contains(Environment.NewLine))
-                {
-                    // 改行（\r\nの２文字）は分ける
-                    int i = token.IndexOf(Environment.NewLine);
-                    //Debug.WriteLine("token=[" + token + "] token.Length=" + token.Length + " Environment.NewLine.Length=" + Environment.NewLine.Length+" i="+i);
-                    tokens2.Add(token.Substring(0, i));
-                    tokens2.Add(NEWLINE); // Substring()は改行を数えてくれない？
-                    tokens2.Add(token.Substring(i + Environment.NewLine.Length));
-                }
-                else if (token.Contains(';'))
-                {
-                    // セミコロンは分ける
-                    int i = token.IndexOf(';');
-                    tokens2.Add(token.Substring(0, i));
-                    tokens2.Add(token.Substring(i));
-                }
-                else if (token.Contains("///"))
-                {
-                    // 複数行コメントは分ける
-                    int i = token.IndexOf("///");
-                    tokens2.Add(token.Substring(0, i));
-                    tokens2.Add(token.Substring(i, i + "///".Length));
-                    tokens2.Add(token.Substring(i + "///".Length));
-                }
-                else if (token.Contains("//"))
-                {
-                    // 複数行コメントは分ける
-                    int i = token.IndexOf("//");
-                    tokens2.Add(token.Substring(0, i));
-                    tokens2.Add(token.Substring(i, i+"//".Length));
-                    tokens2.Add(token.Substring(i + "//".Length));
-                }
-                else
-                {
-                    tokens2.Add(token);
-                }
+                Trace.WriteLine("フェーズ1");
+                string[] tokens1 = LexicalParse1(textBox1.Text);
+                // ダンプ
+                Dump(tokens1);
+
+                Trace.WriteLine("フェーズ2");
+                List<string> tokens2 = LexicalParse2(tokens1);
+                // ダンプ
+                Dump(tokens2);
+
+                Trace.WriteLine("フェーズ3");
+                tokens = LexicalParse3(tokens2);
+                // ダンプ
+                Dump(tokens);
             }
-
-            // ダンプ
-            Dump(tokens2);
-
-            // 空文字列を除去
-            List<string> tokens3 = new List<string>();
-            foreach (string token in tokens2)
-            {
-                if ("" == token)
-                {
-                    // 空文字列は無視
-                }
-                else
-                {
-                    tokens3.Add(token);
-                }
-            }
-
-            // ダンプ
-            Dump(tokens3);
             #endregion
 
             #region クラシフィケーション
+
             bool isLineComment = false;//一行コメント
+            bool isSummaryComment = false;//<summary>～</summary>
             StringBuilder comment = new StringBuilder();
+
             bool isStatic = false;//修飾子
             AccessModify accessModify = AccessModify.Private; // 記述が無ければプライベート
             bool readType = false;
             string type = "";
             bool readName = false;
             string name = "";
-            foreach (string token in tokens3)
+            foreach (string token in tokens)
             {
                 if (isLineComment)
                 {
                     switch (token)
                     {
                         case NEWLINE: comment.Append(" "); isLineComment = false; break;
-                        default: comment.Append(token); break;
+                        case "<summary>": isSummaryComment = true; break;
+                        case "</summary>": isSummaryComment = false; break;
+                        default:
+                            {
+                                if (isSummaryComment)
+                                {
+                                    comment.Append(token);
+                                }
+                                else
+                                {
+                                    // 無視
+                                }
+                            }
+                            break;
                     }
                 }
                 else
