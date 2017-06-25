@@ -115,5 +115,25 @@ namespace UnitTestProject1
 
             Assert.AreEqual(expected: expected, actual: output);
         }
+
+        /// <summary>
+        /// 引数付きメソッド
+        /// </summary>
+        [TestMethod]
+        public void TestMethodWithArgumentList()
+        {
+            string input = @"        /// <summary>
+        /// ドキュメント・コメント
+        /// </summary>
+        /// <returns></returns>
+        public static Type MethodName(int a,int b)
+";
+            string expected = @"{static} + MethodName(int a,int b) : Type 'ドキュメント・コメント'";
+
+            Translator translator = new Translator();
+            string output = translator.Translate(input);
+
+            Assert.AreEqual(expected: expected, actual: output);
+        }
     }
 }

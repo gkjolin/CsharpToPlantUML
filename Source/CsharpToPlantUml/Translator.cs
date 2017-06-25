@@ -102,6 +102,8 @@ namespace CsharpToPlantUml
                             break;
                         case '['://thru
                         case ']'://thru
+                        case '('://thru
+                        case ')'://thru
                         case ';':
                             {
                                 // 1文字で分けるもの
@@ -190,6 +192,9 @@ namespace CsharpToPlantUml
         string type = "";
         bool readName = false;
         string name = "";
+
+        bool isArgumentList = false;
+        StringBuilder argumentList = new StringBuilder();
         /// <summary>
         /// 分類器
         /// </summary>
@@ -242,6 +247,30 @@ namespace CsharpToPlantUml
                         default: break;// 無視
                     }
                 }
+                else if (isArgumentList)
+                {
+                    switch (token)
+                    {
+                        case ")":
+                            {
+                                // 最後の空白は消しておく
+                                string temp = argumentList.ToString().TrimEnd();
+                                argumentList.Clear();
+                                argumentList.Append(temp);
+                                argumentList.Append(token);
+                                isArgumentList = false;
+                            }
+                            break;
+                        default:
+                            {
+                                argumentList.Append(token);
+                                // 引数の型と名前を区切る空白が無くなっているので、
+                                // 適当に足しておく
+                                argumentList.Append(" ");
+                            }
+                            break;
+                    }
+                }
                 else
                 {
                     switch (token)
@@ -272,6 +301,14 @@ namespace CsharpToPlantUml
                                     {
                                         type = token;
                                         readType = true;
+                                    }
+                                    else if ("(" == token) // コンストラクタの場合は名前より早く ( が来る
+                                    {
+                                        if (!isArgumentList)
+                                        {
+                                            argumentList.Append(token);
+                                            isArgumentList = true;
+                                        }
                                     }
                                     else if (!readName)
                                     {
@@ -317,6 +354,10 @@ namespace CsharpToPlantUml
                 // 名前が無い場合、コンストラクタ
                 // 名前
                 sb.Append(type); // 型を名前扱いにする
+
+                // 引数リスト
+                if (0 < argumentList.Length) { sb.Append(argumentList.ToString()); }
+
                 sb.Append(" : ");
                 writedColon = true;
             }
@@ -324,6 +365,10 @@ namespace CsharpToPlantUml
             {
                 // 名前
                 sb.Append(name);
+
+                // 引数リスト
+                if (0 < argumentList.Length) { sb.Append(argumentList.ToString()); }
+
                 sb.Append(" : ");
                 writedColon = true;
                 // 型

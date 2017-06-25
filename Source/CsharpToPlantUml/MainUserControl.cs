@@ -18,12 +18,17 @@ namespace CsharpToPlantUml
             InitializeComponent();
         }
 
-        public void OnLoad()
+        public void AdjustSize()
         {
             // コントロールを、フォームに合わせて広げます
             textBox1.SetBounds(0, textBox1.Bounds.Y, Width, textBox1.Height);
             translationButton.SetBounds(0, translationButton.Bounds.Y, Width, translationButton.Height);
             textBox2.SetBounds(0, textBox2.Bounds.Y, Width, textBox2.Height);
+        }
+
+        public void OnLoad()
+        {
+            AdjustSize();
         }
 
         /// <summary>
@@ -35,6 +40,11 @@ namespace CsharpToPlantUml
         {
             Translator translator = new Translator();
             textBox2.Text = translator.Translate(textBox1.Text);
+        }
+
+        private void MainUserControl_Resize(object sender, EventArgs e)
+        {
+            AdjustSize();
         }
     }
 }
