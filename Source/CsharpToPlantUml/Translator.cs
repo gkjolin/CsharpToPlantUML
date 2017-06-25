@@ -216,7 +216,15 @@ namespace CsharpToPlantUml
                             {
                                 if (isSummaryComment)
                                 {
-                                    comment.Append(token);
+                                    if ("\n"==token)
+                                    {
+                                        // 改行は 半角スペースに変換して１行にする
+                                        comment.Append(" ");
+                                    }
+                                    else
+                                    {
+                                        comment.Append(token);
+                                    }
                                 }
                                 else
                                 {

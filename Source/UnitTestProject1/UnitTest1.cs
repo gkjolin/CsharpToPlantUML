@@ -23,6 +23,27 @@ namespace UnitTestProject1
             Assert.AreEqual(expected: expected, actual: output);
         }
 
+        /// <summary>
+        /// 複数行ドキュメントコメント
+        /// </summary>
+        [TestMethod]
+        public void TestMultipleDocumentComment()
+        {
+            string input = @"        /// <summary>
+        /// ドキュメント・コメント１行目
+        /// ドキュメント・コメント２行目
+        /// ドキュメント・コメント３行目
+        /// </summary>
+        static Type propertyName;
+";
+            string expected = @"{static} - propertyName : Type 'ドキュメント・コメント１行目 ドキュメント・コメント２行目 ドキュメント・コメント３行目'";
+
+            Translator translator = new Translator();
+            string output = translator.Translate(input);
+
+            Assert.AreEqual(expected: expected, actual: output);
+        }
+
         [TestMethod]
         public void TestConstProperty()
         {
