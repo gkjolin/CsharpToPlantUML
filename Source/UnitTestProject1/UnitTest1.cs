@@ -41,6 +41,23 @@ namespace UnitTestProject1
         }
 
         [TestMethod]
+        public void TestConstructor()
+        {
+            string input = @"        /// <summary>
+        /// コンストラクター
+        /// </summary>
+        Config()
+
+";
+            string expected = @"- Config() :  'コンストラクター'";
+
+            Translator translator = new Translator();
+            string output = translator.Translate(input);
+
+            Assert.AreEqual(expected: expected, actual: output);
+        }
+
+        [TestMethod]
         public void TestMethod()
         {
             string input = @"        /// <summary>

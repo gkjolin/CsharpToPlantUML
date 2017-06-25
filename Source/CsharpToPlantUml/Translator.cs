@@ -223,6 +223,7 @@ namespace CsharpToPlantUml
                     {
                         case "///": isLineComment = true; break;
                         case "//": isLineComment = true; break;
+                        case "\n": break;
                         default:
                             {
                                 if (!endMofify)
@@ -277,13 +278,32 @@ namespace CsharpToPlantUml
             {
                 sb.Append("const ");
             }
-            // 名前
-            sb.Append(name);
-            sb.Append(" : ");
-            // 型
-            sb.Append(type);
+
+            bool writedColon = false;
+            if (""==name)
+            {
+                // 名前が無い場合、コンストラクタ
+                // 名前
+                sb.Append(type); // 型を名前扱いにする
+                sb.Append(" : ");
+                writedColon = true;
+            }
+            else
+            {
+                // 名前
+                sb.Append(name);
+                sb.Append(" : ");
+                writedColon = true;
+                // 型
+                sb.Append(type);
+            }
+
             if (0 < comment.Length)
             {
+                if (!writedColon)
+                {
+                    sb.Append(" : ");
+                }
                 sb.Append(" '");
                 sb.Append(comment.ToString().Trim());
                 sb.Append("'");
