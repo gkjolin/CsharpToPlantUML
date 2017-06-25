@@ -1,4 +1,4 @@
-﻿namespace CodeToUml
+﻿namespace CsharpToPlantUml
 {
     partial class MainUserControl
     {
@@ -42,7 +42,7 @@
             this.textBox1.Size = new System.Drawing.Size(165, 110);
             this.textBox1.TabIndex = 0;
             this.textBox1.Text = "        /// <summary>\r\n        /// スコアのスクリプトのキャッシュ\r\n        /// </summary>\r\n     " +
-    "   static Score score_cache;\r\n";
+    "   /// <returns></returns>\r\n        public static Score GetScoreScript()\r\n";
             // 
             // textBox2
             // 
@@ -61,7 +61,7 @@
             this.translationButton.TabIndex = 2;
             this.translationButton.Text = "変換";
             this.translationButton.UseVisualStyleBackColor = true;
-            this.translationButton.Click += new System.EventHandler(this.translationButton_Click);
+            this.translationButton.Click += new System.EventHandler(this.TranslationButton_Click);
             // 
             // MainUserControl
             // 

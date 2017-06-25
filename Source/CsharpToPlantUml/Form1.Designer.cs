@@ -1,4 +1,4 @@
-﻿namespace CodeToUml
+﻿namespace CsharpToPlantUml
 {
     partial class Form1
     {
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.mainUserControl1 = new CodeToUml.MainUserControl();
+            this.mainUserControl1 = new CsharpToPlantUml.MainUserControl();
             this.SuspendLayout();
             // 
             // mainUserControl1
