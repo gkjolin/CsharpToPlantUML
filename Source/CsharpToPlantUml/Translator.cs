@@ -176,6 +176,7 @@ namespace CsharpToPlantUml
         StringBuilder comment = new StringBuilder();
 
         bool isStatic = false;//修飾子
+        bool isConst = false;//修飾子
         AccessModify accessModify = AccessModify.Private; // 記述が無ければプライベート
         bool endMofify = false;
 
@@ -229,6 +230,7 @@ namespace CsharpToPlantUml
                                     switch (token)
                                     {
                                         case "static": isStatic = true; goto gt_next;
+                                        case "const": isConst = true; goto gt_next;
                                         case "public": accessModify = AccessModify.Public; goto gt_next;
                                     }
                                     endMofify = true;
@@ -255,10 +257,43 @@ namespace CsharpToPlantUml
         }
         #endregion
 
-        public string Translate(string text1)
+        public string Build()
         {
             StringBuilder sb = new StringBuilder();
 
+            // 修飾子
+            if (isStatic)
+            {
+                sb.Append("{static} ");
+            }
+            // アクセス修飾子
+            switch (accessModify)
+            {
+                case AccessModify.Private: sb.Append("- "); break;
+                case AccessModify.Public: sb.Append("+ "); break;
+            }
+            // 修飾子
+            if (isConst)
+            {
+                sb.Append("const ");
+            }
+            // 名前
+            sb.Append(name);
+            sb.Append(" : ");
+            // 型
+            sb.Append(type);
+            if (0 < comment.Length)
+            {
+                sb.Append(" '");
+                sb.Append(comment.ToString().Trim());
+                sb.Append("'");
+            }
+
+            return sb.ToString();
+        }
+
+        public string Translate(string text1)
+        {
             #region レキサー
             List<string> tokens;
             {
@@ -281,35 +316,9 @@ namespace CsharpToPlantUml
 
             #region クラシフィケーション
             Classificate(tokens);
-
             #endregion
 
-            #region ビルダー
-            // 修飾子
-            if (isStatic)
-            {
-                sb.Append("{static} ");
-            }
-            // アクセス修飾子
-            switch (accessModify)
-            {
-                case AccessModify.Private: sb.Append("- "); break;
-                case AccessModify.Public: sb.Append("+ "); break;
-            }
-            // 名前
-            sb.Append(name);
-            sb.Append(" : ");
-            // 型
-            sb.Append(type);
-            if (0 < comment.Length)
-            {
-                sb.Append(" '");
-                sb.Append(comment.ToString());
-                sb.Append("'");
-            }
-            #endregion
-
-            return sb.ToString();
+            return Build();
         }
 
     }

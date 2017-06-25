@@ -41,8 +41,8 @@
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.textBox1.Size = new System.Drawing.Size(165, 110);
             this.textBox1.TabIndex = 0;
-            this.textBox1.Text = "        /// <summary>\r\n        /// スコアのスクリプトのキャッシュ\r\n        /// </summary>\r\n     " +
-    "   /// <returns></returns>\r\n        public static Score GetScoreScript()\r\n";
+            this.textBox1.Text = "        /// <summary>\r\n        /// コンストラクター\r\n        /// </summary>\r\n        Conf" +
+    "ig()\r\n";
             // 
             // textBox2
             // 
