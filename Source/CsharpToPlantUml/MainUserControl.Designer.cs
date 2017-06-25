@@ -41,8 +41,8 @@
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.textBox1.Size = new System.Drawing.Size(165, 110);
             this.textBox1.TabIndex = 0;
-            this.textBox1.Text = "        /// <summary>\r\n        /// コンストラクター\r\n        /// </summary>\r\n        Conf" +
-    "ig()\r\n";
+            this.textBox1.Text = "        /// <summary>\r\n        /// 画像ファイル名\r\n        /// </summary>\r\n        [Tool" +
+    "tip(\"画像ファイル名\")]\r\n        public string tileset32x32name = \"tileset32x32\";\r\n";
             // 
             // textBox2
             // 

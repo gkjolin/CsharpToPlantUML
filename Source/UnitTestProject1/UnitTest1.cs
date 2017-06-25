@@ -11,11 +11,11 @@ namespace UnitTestProject1
         public void TestProperty()
         {
             string input = @"        /// <summary>
-        /// スコアのスクリプトのキャッシュ
+        /// ドキュメント・コメント
         /// </summary>
-        static Score score_cache;
+        static Type propertyName;
 ";
-            string expected = @"{static} - score_cache : Score 'スコアのスクリプトのキャッシュ'";
+            string expected = @"{static} - propertyName : Type 'ドキュメント・コメント'";
 
             Translator translator = new Translator();
             string output = translator.Translate(input);
@@ -27,12 +27,33 @@ namespace UnitTestProject1
         public void TestConstProperty()
         {
             string input = @"        /// <summary>
-        /// ゲームオブジェクト名
+        /// ドキュメント・コメント
         /// </summary>
-        const string PREFABS_ROOT = ""Prefabs Root"";
+        const string CONST_STRING_NAME = ""This is a value."";
 
 ";
-            string expected = @"- const PREFABS_ROOT : string 'ゲームオブジェクト名'";
+            string expected = @"- const CONST_STRING_NAME : string 'ドキュメント・コメント'";
+
+            Translator translator = new Translator();
+            string output = translator.Translate(input);
+
+            Assert.AreEqual(expected: expected, actual: output);
+        }
+
+        /// <summary>
+        /// アトリビュートを無視
+        /// </summary>
+        [TestMethod]
+        public void TestConstPropertyIgnoreAttribute()
+        {
+            string input = @"        /// <summary>
+        /// ドキュメント・コメント
+        /// </summary>
+        [Tooltip(""画像ファイル名"")]
+        public string propertyName = ""This is a value."";
+
+";
+            string expected = @"+ propertyName : string 'ドキュメント・コメント'";
 
             Translator translator = new Translator();
             string output = translator.Translate(input);
@@ -44,12 +65,12 @@ namespace UnitTestProject1
         public void TestConstructor()
         {
             string input = @"        /// <summary>
-        /// コンストラクター
+        /// ドキュメント・コメント
         /// </summary>
-        Config()
+        ConstructorName()
 
 ";
-            string expected = @"- Config() :  'コンストラクター'";
+            string expected = @"- ConstructorName() :  'ドキュメント・コメント'";
 
             Translator translator = new Translator();
             string output = translator.Translate(input);
@@ -61,12 +82,12 @@ namespace UnitTestProject1
         public void TestMethod()
         {
             string input = @"        /// <summary>
-        /// スコアのスクリプトのキャッシュ
+        /// ドキュメント・コメント
         /// </summary>
         /// <returns></returns>
-        public static Score GetScoreScript()
+        public static Type MethodName()
 ";
-            string expected = @"{static} + GetScoreScript() : Score 'スコアのスクリプトのキャッシュ'";
+            string expected = @"{static} + MethodName() : Type 'ドキュメント・コメント'";
 
             Translator translator = new Translator();
             string output = translator.Translate(input);

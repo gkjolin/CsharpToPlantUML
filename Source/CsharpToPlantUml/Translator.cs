@@ -100,10 +100,13 @@ namespace CsharpToPlantUml
                                 }
                             }
                             break;
+                        case '['://thru
+                        case ']'://thru
                         case ';':
                             {
+                                // 1文字で分けるもの
                                 FlushWord(word, tokens2);
-                                tokens2.Add(token[caret].ToString());// セミコロンは分ける
+                                tokens2.Add(token[caret].ToString());
                                 caret++;
                             }
                             break;
@@ -175,6 +178,9 @@ namespace CsharpToPlantUml
         bool isSummaryComment = false;//<summary>～</summary>
         StringBuilder comment = new StringBuilder();
 
+        bool isAttribute = false;//例：[Tooltip("画像ファイル名")]
+
+        bool startedSigunature = false;
         bool isStatic = false;//修飾子
         bool isConst = false;//修飾子
         AccessModify accessModify = AccessModify.Private; // 記述が無ければプライベート
@@ -191,6 +197,14 @@ namespace CsharpToPlantUml
         {
             foreach (string token in tokens)
             {
+                if (!startedSigunature)
+                {
+                    if (isStatic || isConst || accessModify!=AccessModify.Private || readType || readName)
+                    {
+                        startedSigunature = true;
+                    }
+                }
+
                 if (isLineComment)
                 {
                     switch (token)
@@ -212,13 +226,16 @@ namespace CsharpToPlantUml
                             break;
                     }
                 }
+                else if (isAttribute)
+                {
+                    switch (token)
+                    {
+                        case "]": isAttribute = false; break;
+                        default: break;// 無視
+                    }
+                }
                 else
                 {
-                    if (!endMofify)
-                    {
-
-                    }
-
                     switch (token)
                     {
                         case "///": isLineComment = true; break;
@@ -226,26 +243,33 @@ namespace CsharpToPlantUml
                         case "\n": break;
                         default:
                             {
-                                if (!endMofify)
+                                if (!startedSigunature && "["==token)
                                 {
-                                    switch (token)
+                                    isAttribute = true;
+                                }
+                                else
+                                {
+                                    if (!endMofify)
                                     {
-                                        case "static": isStatic = true; goto gt_next;
-                                        case "const": isConst = true; goto gt_next;
-                                        case "public": accessModify = AccessModify.Public; goto gt_next;
+                                        switch (token)
+                                        {
+                                            case "static": isStatic = true; goto gt_next;
+                                            case "const": isConst = true; goto gt_next;
+                                            case "public": accessModify = AccessModify.Public; goto gt_next;
+                                        }
+                                        endMofify = true;
                                     }
-                                    endMofify = true;
-                                }
 
-                                if (!readType)
-                                {
-                                    type = token;
-                                    readType = true;
-                                }
-                                else if (!readName)
-                                {
-                                    name = token;
-                                    readName = true;
+                                    if (!readType)
+                                    {
+                                        type = token;
+                                        readType = true;
+                                    }
+                                    else if (!readName)
+                                    {
+                                        name = token;
+                                        readName = true;
+                                    }
                                 }
                             }
                             break;
