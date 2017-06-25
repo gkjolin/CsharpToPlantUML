@@ -15,7 +15,24 @@ namespace UnitTestProject1
         /// </summary>
         static Score score_cache;
 ";
-            string expected = @"{static} - score_cache : Score ' スコアのスクリプトのキャッシュ  '";
+            string expected = @"{static} - score_cache : Score 'スコアのスクリプトのキャッシュ'";
+
+            Translator translator = new Translator();
+            string output = translator.Translate(input);
+
+            Assert.AreEqual(expected: expected, actual: output);
+        }
+
+        [TestMethod]
+        public void TestConstProperty()
+        {
+            string input = @"        /// <summary>
+        /// ゲームオブジェクト名
+        /// </summary>
+        const string PREFABS_ROOT = ""Prefabs Root"";
+
+";
+            string expected = @"- const PREFABS_ROOT : string 'ゲームオブジェクト名'";
 
             Translator translator = new Translator();
             string output = translator.Translate(input);
@@ -32,7 +49,7 @@ namespace UnitTestProject1
         /// <returns></returns>
         public static Score GetScoreScript()
 ";
-            string expected = @"{static} + GetScoreScript() : Score ' スコアのスクリプトのキャッシュ   '";
+            string expected = @"{static} + GetScoreScript() : Score 'スコアのスクリプトのキャッシュ'";
 
             Translator translator = new Translator();
             string output = translator.Translate(input);
