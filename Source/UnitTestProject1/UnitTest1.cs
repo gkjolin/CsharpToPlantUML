@@ -17,8 +17,9 @@ namespace UnitTestProject1
 ";
             string expected = @"{static} - propertyName : Type 'ドキュメント・コメント'";
 
-            Translator translator = new Translator();
-            string output = translator.Translate(input);
+            CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
+            Pibot pibot = codeToPibotBuilder.Translate(input);
+            string output = new PibotToUmlBuilder().Build(pibot);
 
             Assert.AreEqual(expected: expected, actual: output);
         }
@@ -38,8 +39,9 @@ namespace UnitTestProject1
 ";
             string expected = @"{static} - propertyName : Type 'ドキュメント・コメント１行目 ドキュメント・コメント２行目 ドキュメント・コメント３行目'";
 
-            Translator translator = new Translator();
-            string output = translator.Translate(input);
+            CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
+            Pibot pibot = codeToPibotBuilder.Translate(input);
+            string output = new PibotToUmlBuilder().Build(pibot);
 
             Assert.AreEqual(expected: expected, actual: output);
         }
@@ -55,8 +57,9 @@ namespace UnitTestProject1
 ";
             string expected = @"- const CONST_STRING_NAME : string 'ドキュメント・コメント'";
 
-            Translator translator = new Translator();
-            string output = translator.Translate(input);
+            CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
+            Pibot pibot = codeToPibotBuilder.Translate(input);
+            string output = new PibotToUmlBuilder().Build(pibot);
 
             Assert.AreEqual(expected: expected, actual: output);
         }
@@ -76,8 +79,9 @@ namespace UnitTestProject1
 ";
             string expected = @"+ propertyName : string 'ドキュメント・コメント'";
 
-            Translator translator = new Translator();
-            string output = translator.Translate(input);
+            CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
+            Pibot pibot = codeToPibotBuilder.Translate(input);
+            string output = new PibotToUmlBuilder().Build(pibot);
 
             Assert.AreEqual(expected: expected, actual: output);
         }
@@ -93,8 +97,9 @@ namespace UnitTestProject1
 ";
             string expected = @"- ConstructorName() :  'ドキュメント・コメント'";
 
-            Translator translator = new Translator();
-            string output = translator.Translate(input);
+            CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
+            Pibot pibot = codeToPibotBuilder.Translate(input);
+            string output = new PibotToUmlBuilder().Build(pibot);
 
             Assert.AreEqual(expected: expected, actual: output);
         }
@@ -110,8 +115,9 @@ namespace UnitTestProject1
 ";
             string expected = @"{static} + MethodName() : Type 'ドキュメント・コメント'";
 
-            Translator translator = new Translator();
-            string output = translator.Translate(input);
+            CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
+            Pibot pibot = codeToPibotBuilder.Translate(input);
+            string output = new PibotToUmlBuilder().Build(pibot);
 
             Assert.AreEqual(expected: expected, actual: output);
         }
@@ -130,8 +136,9 @@ namespace UnitTestProject1
 ";
             string expected = @"{static} + MethodName(int a,int b) : Type 'ドキュメント・コメント'";
 
-            Translator translator = new Translator();
-            string output = translator.Translate(input);
+            CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
+            Pibot pibot = codeToPibotBuilder.Translate(input);
+            string output = new PibotToUmlBuilder().Build(pibot);
 
             Assert.AreEqual(expected: expected, actual: output);
         }

@@ -10,49 +10,8 @@ namespace CsharpToPlantUml
     /// <summary>
     /// 翻訳機
     /// </summary>
-    public class Translator
+    public class CodeToPibotBuilder
     {
-        /// <summary>
-        /// ダンプ
-        /// </summary>
-        void Dump(string[] tokens)
-        {
-            int i = 0;
-            foreach (string token in tokens)
-            {
-                Trace.WriteLine("(" + i + ")[" + token + "]");
-                i++;
-            }
-        }
-
-        /// <summary>
-        /// ダンプ
-        /// </summary>
-        void Dump(List<string> tokens)
-        {
-            int i = 0;
-            foreach (string token in tokens)
-            {
-                Trace.WriteLine("(" + i + ")[" + token + "]");
-                i++;
-            }
-        }
-
-        /// <summary>
-        /// アクセス修飾子
-        /// </summary>
-        enum AccessModify
-        {
-            Public,
-            Private,
-            Num
-        }
-
-        /// <summary>
-        /// 改行変数 "\r\n" 他を文字列定数 "\n" に統一する
-        /// </summary>
-        const string NEWLINE = "\n";
-
         /// <summary>
         /// 字句解析1
         /// </summary>
@@ -90,7 +49,7 @@ namespace CsharpToPlantUml
                                 {
                                     // 改行
                                     FlushWord(word, tokens2);
-                                    tokens2.Add(NEWLINE);// 改行は'\n'１つに変換
+                                    tokens2.Add(Common.NEWLINE);// 改行は'\n'１つに変換
                                     caret += 2;
                                 }
                                 else
@@ -151,60 +110,29 @@ namespace CsharpToPlantUml
             return tokens2;
         }
 
-        /// <summary>
-        /// 字句解析3
-        /// </summary>
-        /// <param name="tokens"></param>
-        /// <returns></returns>
-        List<string> LexicalParse3(List<string> tokens)
-        {
-            // 空文字列を除去
-            List<string> tokens2 = new List<string>();
-            foreach (string token in tokens)
-            {
-                if ("" == token)
-                {
-                    // 空文字列は無視
-                }
-                else
-                {
-                    tokens2.Add(token);
-                }
-            }
-
-            return tokens2;
-        }
-
         #region 分類器
         bool isLineComment = false;//一行コメント
         bool isSummaryComment = false;//<summary>～</summary>
-        StringBuilder comment = new StringBuilder();
 
         bool isAttribute = false;//例：[Tooltip("画像ファイル名")]
 
         bool startedSigunature = false;
-        bool isStatic = false;//修飾子
-        bool isConst = false;//修飾子
-        AccessModify accessModify = AccessModify.Private; // 記述が無ければプライベート
         bool endMofify = false;
 
         bool readType = false;
-        string type = "";
         bool readName = false;
-        string name = "";
 
         bool isArgumentList = false;
-        StringBuilder argumentList = new StringBuilder();
         /// <summary>
         /// 分類器
         /// </summary>
-        void Classificate(List<string> tokens)
+        void Classificate(List<string> tokens, Pibot pibot)
         {
             foreach (string token in tokens)
             {
                 if (!startedSigunature)
                 {
-                    if (isStatic || isConst || accessModify!=AccessModify.Private || readType || readName)
+                    if (pibot.isStatic || pibot.isConst || pibot.accessModify != Pibot.AccessModify.Private || readType || readName)
                     {
                         startedSigunature = true;
                     }
@@ -214,7 +142,7 @@ namespace CsharpToPlantUml
                 {
                     switch (token)
                     {
-                        case NEWLINE: comment.Append(" "); isLineComment = false; break;
+                        case Common.NEWLINE: pibot.comment.Append(" "); isLineComment = false; break;
                         case "<summary>": isSummaryComment = true; break;
                         case "</summary>": isSummaryComment = false; break;
                         default:
@@ -224,11 +152,11 @@ namespace CsharpToPlantUml
                                     if ("\n"==token)
                                     {
                                         // 改行は 半角スペースに変換して１行にする
-                                        comment.Append(" ");
+                                        pibot.comment.Append(" ");
                                     }
                                     else
                                     {
-                                        comment.Append(token);
+                                        pibot.comment.Append(token);
                                     }
                                 }
                                 else
@@ -254,19 +182,19 @@ namespace CsharpToPlantUml
                         case ")":
                             {
                                 // 最後の空白は消しておく
-                                string temp = argumentList.ToString().TrimEnd();
-                                argumentList.Clear();
-                                argumentList.Append(temp);
-                                argumentList.Append(token);
+                                string temp = pibot.argumentList.ToString().TrimEnd();
+                                pibot.argumentList.Clear();
+                                pibot.argumentList.Append(temp);
+                                pibot.argumentList.Append(token);
                                 isArgumentList = false;
                             }
                             break;
                         default:
                             {
-                                argumentList.Append(token);
+                                pibot.argumentList.Append(token);
                                 // 引数の型と名前を区切る空白が無くなっているので、
                                 // 適当に足しておく
-                                argumentList.Append(" ");
+                                pibot.argumentList.Append(" ");
                             }
                             break;
                     }
@@ -290,29 +218,29 @@ namespace CsharpToPlantUml
                                     {
                                         switch (token)
                                         {
-                                            case "static": isStatic = true; goto gt_next;
-                                            case "const": isConst = true; goto gt_next;
-                                            case "public": accessModify = AccessModify.Public; goto gt_next;
+                                            case "static": pibot.isStatic = true; goto gt_next;
+                                            case "const": pibot.isConst = true; goto gt_next;
+                                            case "public": pibot.accessModify = Pibot.AccessModify.Public; goto gt_next;
                                         }
                                         endMofify = true;
                                     }
 
                                     if (!readType)
                                     {
-                                        type = token;
+                                        pibot.type = token;
                                         readType = true;
                                     }
                                     else if ("(" == token) // コンストラクタの場合は名前より早く ( が来る
                                     {
                                         if (!isArgumentList)
                                         {
-                                            argumentList.Append(token);
+                                            pibot.argumentList.Append(token);
                                             isArgumentList = true;
                                         }
                                     }
                                     else if (!readName)
                                     {
-                                        name = token;
+                                        pibot.name = token;
                                         readName = true;
                                     }
                                 }
@@ -327,69 +255,9 @@ namespace CsharpToPlantUml
         }
         #endregion
 
-        public string Build()
-        {
-            StringBuilder sb = new StringBuilder();
 
-            // 修飾子
-            if (isStatic)
-            {
-                sb.Append("{static} ");
-            }
-            // アクセス修飾子
-            switch (accessModify)
-            {
-                case AccessModify.Private: sb.Append("- "); break;
-                case AccessModify.Public: sb.Append("+ "); break;
-            }
-            // 修飾子
-            if (isConst)
-            {
-                sb.Append("const ");
-            }
 
-            bool writedColon = false;
-            if (""==name)
-            {
-                // 名前が無い場合、コンストラクタ
-                // 名前
-                sb.Append(type); // 型を名前扱いにする
-
-                // 引数リスト
-                if (0 < argumentList.Length) { sb.Append(argumentList.ToString()); }
-
-                sb.Append(" : ");
-                writedColon = true;
-            }
-            else
-            {
-                // 名前
-                sb.Append(name);
-
-                // 引数リスト
-                if (0 < argumentList.Length) { sb.Append(argumentList.ToString()); }
-
-                sb.Append(" : ");
-                writedColon = true;
-                // 型
-                sb.Append(type);
-            }
-
-            if (0 < comment.Length)
-            {
-                if (!writedColon)
-                {
-                    sb.Append(" : ");
-                }
-                sb.Append(" '");
-                sb.Append(comment.ToString().Trim());
-                sb.Append("'");
-            }
-
-            return sb.ToString();
-        }
-
-        public string Translate(string text1)
+        public Pibot Translate(string text1)
         {
             #region レキサー
             List<string> tokens;
@@ -397,25 +265,26 @@ namespace CsharpToPlantUml
                 Trace.WriteLine("フェーズ1");
                 string[] tokens1 = LexicalParse1(text1);
                 // ダンプ
-                Dump(tokens1);
+                Common.Dump(tokens1);
 
                 Trace.WriteLine("フェーズ2");
                 List<string> tokens2 = LexicalParse2(tokens1);
                 // ダンプ
-                Dump(tokens2);
+                Common.Dump(tokens2);
 
                 Trace.WriteLine("フェーズ3");
-                tokens = LexicalParse3(tokens2);
+                tokens = Common.DeleteEmptyStringElement(tokens2);
                 // ダンプ
-                Dump(tokens);
+                Common.Dump(tokens);
             }
             #endregion
 
             #region クラシフィケーション
-            Classificate(tokens);
+            Pibot pibot = new Pibot();
+            Classificate(tokens, pibot);
             #endregion
 
-            return Build();
+            return pibot;
         }
 
     }
