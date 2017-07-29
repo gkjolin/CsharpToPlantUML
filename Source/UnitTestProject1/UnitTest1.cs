@@ -7,15 +7,20 @@ namespace UnitTestProject1
     [TestClass]
     public class UnitTest1
     {
+        /// <summary>
+        /// 複数行サマリーコメント
+        /// </summary>
         [TestMethod]
-        public void TestProperty()
+        public void TestMultipleSummaryComment()
         {
             string input = @"        /// <summary>
-        /// ドキュメント・コメント
+        /// サマリー・コメント１行目
+        /// サマリー・コメント２行目
+        /// サマリー・コメント３行目
         /// </summary>
         static Type propertyName;
 ";
-            string expected = @"{static} - propertyName : Type 'ドキュメント・コメント'";
+            string expected = @"{static} - propertyName : Type 'サマリー・コメント１行目 サマリー・コメント２行目 サマリー・コメント３行目'";
 
             CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
             Pibot pibot = codeToPibotBuilder.Translate(input);
@@ -24,20 +29,32 @@ namespace UnitTestProject1
             Assert.AreEqual(expected: expected, actual: output);
         }
 
-        /// <summary>
-        /// 複数行ドキュメントコメント
-        /// </summary>
         [TestMethod]
-        public void TestMultipleDocumentComment()
+        public void TestProperty()
         {
             string input = @"        /// <summary>
-        /// ドキュメント・コメント１行目
-        /// ドキュメント・コメント２行目
-        /// ドキュメント・コメント３行目
+        /// サマリー・コメント
         /// </summary>
         static Type propertyName;
 ";
-            string expected = @"{static} - propertyName : Type 'ドキュメント・コメント１行目 ドキュメント・コメント２行目 ドキュメント・コメント３行目'";
+            string expected = @"{static} - propertyName : Type 'サマリー・コメント'";
+
+            CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
+            Pibot pibot = codeToPibotBuilder.Translate(input);
+            string output = new PibotToUmlBuilder().Build(pibot);
+
+            Assert.AreEqual(expected: expected, actual: output);
+        }
+
+        [TestMethod]
+        public void TestPropertyGenericType()
+        {
+            string input = @"        /// <summary>
+        /// サマリー・コメント
+        /// </summary>
+        Dictionary<Type1, Type2> propertyName;
+";
+            string expected = @"- propertyName : Dictionary<Type1, Type2> 'サマリー・コメント'";
 
             CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
             Pibot pibot = codeToPibotBuilder.Translate(input);
@@ -50,12 +67,12 @@ namespace UnitTestProject1
         public void TestConstProperty()
         {
             string input = @"        /// <summary>
-        /// ドキュメント・コメント
+        /// サマリー・コメント
         /// </summary>
         const string CONST_STRING_NAME = ""This is a value."";
 
 ";
-            string expected = @"- const CONST_STRING_NAME : string 'ドキュメント・コメント'";
+            string expected = @"- const CONST_STRING_NAME : string 'サマリー・コメント'";
 
             CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
             Pibot pibot = codeToPibotBuilder.Translate(input);
@@ -71,13 +88,13 @@ namespace UnitTestProject1
         public void TestConstPropertyIgnoreAttribute()
         {
             string input = @"        /// <summary>
-        /// ドキュメント・コメント
+        /// サマリー・コメント
         /// </summary>
         [Tooltip(""画像ファイル名"")]
         public string propertyName = ""This is a value."";
 
 ";
-            string expected = @"+ propertyName : string 'ドキュメント・コメント'";
+            string expected = @"+ propertyName : string 'サマリー・コメント'";
 
             CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
             Pibot pibot = codeToPibotBuilder.Translate(input);
@@ -90,12 +107,12 @@ namespace UnitTestProject1
         public void TestConstructor()
         {
             string input = @"        /// <summary>
-        /// ドキュメント・コメント
+        /// サマリー・コメント
         /// </summary>
         ConstructorName()
 
 ";
-            string expected = @"- ConstructorName() :  'ドキュメント・コメント'";
+            string expected = @"- ConstructorName() :  'サマリー・コメント'";
 
             CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
             Pibot pibot = codeToPibotBuilder.Translate(input);
@@ -108,12 +125,12 @@ namespace UnitTestProject1
         public void TestMethod()
         {
             string input = @"        /// <summary>
-        /// ドキュメント・コメント
+        /// サマリー・コメント
         /// </summary>
         /// <returns></returns>
         public static Type MethodName()
 ";
-            string expected = @"{static} + MethodName() : Type 'ドキュメント・コメント'";
+            string expected = @"{static} + MethodName() : Type 'サマリー・コメント'";
 
             CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
             Pibot pibot = codeToPibotBuilder.Translate(input);
@@ -129,12 +146,12 @@ namespace UnitTestProject1
         public void TestMethodWithArgumentList()
         {
             string input = @"        /// <summary>
-        /// ドキュメント・コメント
+        /// サマリー・コメント
         /// </summary>
         /// <returns></returns>
         public static Type MethodName(int a,int b)
 ";
-            string expected = @"{static} + MethodName(int a,int b) : Type 'ドキュメント・コメント'";
+            string expected = @"{static} + MethodName(int a,int b) : Type 'サマリー・コメント'";
 
             CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
             Pibot pibot = codeToPibotBuilder.Translate(input);

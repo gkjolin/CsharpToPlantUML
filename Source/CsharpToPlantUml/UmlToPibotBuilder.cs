@@ -169,7 +169,7 @@ namespace CsharpToPlantUml
                 }
 
                 // これ以降、コメント
-                pibot.comment.Append(token);
+                pibot.summaryComment.Append(token);
             }
 
 

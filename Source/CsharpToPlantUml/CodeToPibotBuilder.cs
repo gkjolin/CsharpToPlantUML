@@ -13,11 +13,12 @@ namespace CsharpToPlantUml
     public class CodeToPibotBuilder
     {
         /// <summary>
-        /// 字句解析1
+        /// 字句解析(Lexical Parser)
+        /// 半角スペースでの分割
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        string[] LexicalParse1(string text)
+        string[] Lex_SplitBySpace(string text)
         {
             return text.Split(' ');
         }
@@ -27,34 +28,36 @@ namespace CsharpToPlantUml
             if (0 < word.Length) { tokens2.Add(word.ToString()); word.Clear(); }
         }
         /// <summary>
-        /// 字句解析2
+        /// 字句解析(Lexical Parser)
+        /// 
+        /// 字トークンへの分割
         /// </summary>
-        /// <param name="tokens"></param>
+        /// <param name="words">半角空白で区切った程度のトークン</param>
         /// <returns></returns>
-        List<string> LexicalParse2(string[] tokens)
+        List<string> Lex_ToCharChanks(string[] words)
         {
-            StringBuilder word = new StringBuilder();
+            StringBuilder chars = new StringBuilder();
 
             List<string> tokens2 = new List<string>();
-            foreach (string token in tokens)
+            foreach (string word in words)
             {
                 int caret = 0;
-                while (caret < token.Length)
+                while (caret < word.Length)
                 {
-                    switch (token[caret])
+                    switch (word[caret])
                     {
                         case '\r':
                             {
-                                if (caret + 1 < token.Length && '\n' == token[caret + 1])
+                                if (caret + 1 < word.Length && '\n' == word[caret + 1])
                                 {
                                     // 改行
-                                    FlushWord(word, tokens2);
+                                    FlushWord(chars, tokens2);
                                     tokens2.Add(Common.NEWLINE);// 改行は'\n'１つに変換
                                     caret += 2;
                                 }
                                 else
                                 {
-                                    word.Append(token[caret]);
+                                    chars.Append(word[caret]);
                                     caret++;
                                 }
                             }
@@ -63,58 +66,64 @@ namespace CsharpToPlantUml
                         case ']'://thru
                         case '('://thru
                         case ')'://thru
+                        case '<'://thru
+                        case '>'://thru
+                        case ','://thru
                         case ';':
                             {
                                 // 1文字で分けるもの
-                                FlushWord(word, tokens2);
-                                tokens2.Add(token[caret].ToString());
+                                FlushWord(chars, tokens2);
+                                tokens2.Add(word[caret].ToString());
                                 caret++;
                             }
                             break;
                         case '/':
                             {
-                                if (caret + 1 < token.Length && '/' == token[caret + 1])
+                                if (caret + 1 < word.Length && '/' == word[caret + 1])
                                 {
-                                    if (caret + 2 < token.Length && '/' == token[caret + 2])
+                                    if (caret + 2 < word.Length && '/' == word[caret + 2])
                                     {
                                         // 「///」
-                                        FlushWord(word, tokens2);
+                                        FlushWord(chars, tokens2);
                                         tokens2.Add("///");
                                         caret += 3;
                                     }
                                     else
                                     {
                                         // 「//」
-                                        FlushWord(word, tokens2);
+                                        FlushWord(chars, tokens2);
                                         tokens2.Add("//");
                                         caret += 2;
                                     }
                                 }
                                 else
                                 {
-                                    word.Append(token[caret]);
+                                    chars.Append(word[caret]);
                                     caret++;
                                 }
                             }
                             break;
                         default:
-                            word.Append(token[caret]);
+                            chars.Append(word[caret]);
                             caret++;
                             break;
                     }
                 }
 
-                FlushWord(word, tokens2);
+                FlushWord(chars, tokens2);
             }
 
             return tokens2;
         }
 
         #region 分類器
-        bool isLineComment = false;//一行コメント
-        bool isSummaryComment = false;//<summary>～</summary>
+        bool inSinglelineComment = false; // 一行コメント中
+        bool inDocumentComment = false; // ドキュメント・コメント中
+        bool inSummaryComment = false; // < summary >～< /summary >
 
         bool isAttribute = false;//例：[Tooltip("画像ファイル名")]
+        int depthOfOpendAngleBracketForGenericParameters = int.MaxValue;//例：<Type1,Type2>
+        int depthOfOpendAngleBracket = 0;//例：<
 
         bool startedSigunature = false;
         bool endMofify = false;
@@ -138,35 +147,62 @@ namespace CsharpToPlantUml
                     }
                 }
 
-                if (isLineComment)
+                #region ドキュメント・コメント
+                if (inDocumentComment)
                 {
+                    pibot.documentComment.Append(token);
+
+                    if (">"==token)
+                    {
+                        string docCmt = pibot.documentComment.ToString();
+                        if (docCmt.EndsWith("<summary>"))
+                        {
+                            inSummaryComment = true;
+                            goto gt_EndLineComment;
+                        }
+                        else if (docCmt.EndsWith("</summary>"))
+                        {
+                            pibot.summaryComment.Length -= "</summary>".Length;
+                            inSummaryComment = false;
+                            goto gt_EndLineComment;
+                        }
+                    }
+
                     switch (token)
                     {
-                        case Common.NEWLINE: pibot.comment.Append(" "); isLineComment = false; break;
-                        case "<summary>": isSummaryComment = true; break;
-                        case "</summary>": isSummaryComment = false; break;
+                        case Common.NEWLINE: pibot.summaryComment.Append(" "); inDocumentComment = false; break;
                         default:
                             {
-                                if (isSummaryComment)
+                                if (inSummaryComment)
                                 {
                                     if ("\n"==token)
                                     {
                                         // 改行は 半角スペースに変換して１行にする
-                                        pibot.comment.Append(" ");
+                                        pibot.summaryComment.Append(" ");
                                     }
                                     else
                                     {
-                                        pibot.comment.Append(token);
+                                        pibot.summaryComment.Append(token);
                                     }
-                                }
-                                else
-                                {
-                                    // 無視
                                 }
                             }
                             break;
                     }
+
+                    gt_EndLineComment:
+                    ;
                 }
+                #endregion
+                #region 一行コメント
+                else if (inSinglelineComment)
+                {
+                    if ("\n" == token)
+                    {
+                        inSinglelineComment = false;
+                    }
+                }
+                #endregion
+                #region アトリビュート
                 else if (isAttribute)
                 {
                     switch (token)
@@ -175,18 +211,52 @@ namespace CsharpToPlantUml
                         default: break;// 無視
                     }
                 }
+                #endregion
+                #region ジェネリック引数
+                else if (depthOfOpendAngleBracketForGenericParameters <= depthOfOpendAngleBracket)
+                {
+                    switch (token)
+                    {
+                        case ",":
+                            {
+                                // カンマの後ろに空白を足しておく
+                                pibot.genericParameters.Append(token);
+                                pibot.genericParameters.Append(" ");
+                            }
+                            break;
+                        case ">":
+                            {
+                                pibot.genericParameters.Append(token);
+                                depthOfOpendAngleBracket--;
+                            }
+                            break;
+                        default:
+                            {
+                                pibot.genericParameters.Append(token);
+                            }
+                            break;
+                    }
+                }
+                #endregion
+                #region 引数のリスト
                 else if (isArgumentList)
                 {
                     switch (token)
                     {
+                        // 直前の空白は削除して追加したい
+                        case ",": // thru
                         case ")":
                             {
-                                // 最後の空白は消しておく
+                                // 消す前に退避
                                 string temp = pibot.argumentList.ToString().TrimEnd();
+                                // 最後の空白は消しておく
                                 pibot.argumentList.Clear();
                                 pibot.argumentList.Append(temp);
                                 pibot.argumentList.Append(token);
-                                isArgumentList = false;
+                                if (")"== token)
+                                {
+                                    isArgumentList = false;
+                                }
                             }
                             break;
                         default:
@@ -199,16 +269,17 @@ namespace CsharpToPlantUml
                             break;
                     }
                 }
+                #endregion
                 else
                 {
                     switch (token)
                     {
-                        case "///": isLineComment = true; break;
-                        case "//": isLineComment = true; break;
+                        case "///": inDocumentComment = true; break;
+                        case "//": inSinglelineComment = true; break;
                         case "\n": break;
                         default:
                             {
-                                if (!startedSigunature && "["==token)
+                                if (!startedSigunature && "[" == token)
                                 {
                                     isAttribute = true;
                                 }
@@ -238,6 +309,20 @@ namespace CsharpToPlantUml
                                             isArgumentList = true;
                                         }
                                     }
+                                    else if ("<" == token)
+                                    {
+                                        pibot.genericParameters.Append(token);
+                                        depthOfOpendAngleBracket++;
+                                        if (!readName)
+                                        {
+                                            depthOfOpendAngleBracketForGenericParameters = depthOfOpendAngleBracket;
+                                        }
+                                    }
+                                    else if (">" == token)
+                                    {
+                                        pibot.genericParameters.Append(token);
+                                        depthOfOpendAngleBracket--;
+                                    }
                                     else if (!readName)
                                     {
                                         pibot.name = token;
@@ -263,12 +348,12 @@ namespace CsharpToPlantUml
             List<string> tokens;
             {
                 Trace.WriteLine("フェーズ1");
-                string[] tokens1 = LexicalParse1(text1);
+                string[] tokens1 = Lex_SplitBySpace(text1);
                 // ダンプ
                 Common.Dump(tokens1);
 
                 Trace.WriteLine("フェーズ2");
-                List<string> tokens2 = LexicalParse2(tokens1);
+                List<string> tokens2 = Lex_ToCharChanks(tokens1);
                 // ダンプ
                 Common.Dump(tokens2);
 

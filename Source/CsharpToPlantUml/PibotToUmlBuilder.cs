@@ -54,16 +54,18 @@ namespace CsharpToPlantUml
                 writedColon = true;
                 // 型
                 sb.Append(pibot.type);
+                // ジェネリック型引数
+                if (0 < pibot.genericParameters.Length) { sb.Append(pibot.genericParameters.ToString()); }
             }
 
-            if (0 < pibot.comment.Length)
+            if (0 < pibot.summaryComment.Length)
             {
                 if (!writedColon)
                 {
                     sb.Append(" : ");
                 }
                 sb.Append(" '");
-                sb.Append(pibot.comment.ToString().Trim());
+                sb.Append(pibot.summaryComment.ToString().Trim());
                 sb.Append("'");
             }
 

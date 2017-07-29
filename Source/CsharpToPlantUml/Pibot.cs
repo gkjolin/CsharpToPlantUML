@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace CsharpToPlantUml
 {
@@ -11,11 +7,13 @@ namespace CsharpToPlantUml
         public Pibot()
         {
             // 記述が無ければプライベート
-            accessModify = Pibot.AccessModify.Private;
+            accessModify = AccessModify.Private;
             name = "";
             type = "";
+            genericParameters = new StringBuilder();
             argumentList = new StringBuilder();
-            comment = new StringBuilder();
+            documentComment = new StringBuilder();
+            summaryComment = new StringBuilder();
         }
 
         /// <summary>
@@ -39,14 +37,25 @@ namespace CsharpToPlantUml
         public string type;
 
         /// <summary>
+        /// ジェネリック型引数
+        /// 例：「Type1, Type2」
+        /// </summary>
+        public StringBuilder genericParameters;
+
+        /// <summary>
         /// 引数のリスト
         /// </summary>
         public StringBuilder argumentList;
 
         /// <summary>
-        /// コメント
+        /// ドキュメント・コメント全体
         /// </summary>
-        public StringBuilder comment;
+        public StringBuilder documentComment;
+
+        /// <summary>
+        /// サマリー・コメント
+        /// </summary>
+        public StringBuilder summaryComment;
 
         /// <summary>
         /// アクセス修飾子
