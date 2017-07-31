@@ -28,6 +28,11 @@ namespace CsharpToPlantUml
             {
                 sb.Append("const ");
             }
+            // 修飾子
+            if (pibot.isReadonly)
+            {
+                sb.Append("readonly ");
+            }
 
             bool writedColon = false;
             if ("" == pibot.name)

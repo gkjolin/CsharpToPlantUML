@@ -27,6 +27,11 @@ namespace CsharpToPlantUml
         public bool isConst;
 
         /// <summary>
+        /// 修飾子
+        /// </summary>
+        public bool isReadonly;
+
+        /// <summary>
         /// 要素名
         /// </summary>
         public string name;

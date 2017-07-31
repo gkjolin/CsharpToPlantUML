@@ -141,7 +141,7 @@ namespace CsharpToPlantUml
             {
                 if (!startedSigunature)
                 {
-                    if (pibot.isStatic || pibot.isConst || pibot.accessModify != Pibot.AccessModify.Private || readType || readName)
+                    if (pibot.isStatic || pibot.isConst || pibot.isReadonly || pibot.accessModify != Pibot.AccessModify.Private || readType || readName)
                     {
                         startedSigunature = true;
                     }
@@ -291,6 +291,7 @@ namespace CsharpToPlantUml
                                         {
                                             case "static": pibot.isStatic = true; goto gt_next;
                                             case "const": pibot.isConst = true; goto gt_next;
+                                            case "readonly": pibot.isReadonly = true; goto gt_next;
                                             case "public": pibot.accessModify = Pibot.AccessModify.Public; goto gt_next;
                                         }
                                         endMofify = true;
