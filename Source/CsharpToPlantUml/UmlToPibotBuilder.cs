@@ -113,6 +113,26 @@ namespace CsharpToPlantUml
                 // 修飾子
                 switch (token)
                 {
+                    case "<<internal>>": // not working. FIXME: トークンにしたい
+                        pibot.accessModify = Pibot.AccessModify.Internal;
+                        phase = 200;
+                        parsed = true;
+                        break;
+                    case "-":
+                        pibot.accessModify = Pibot.AccessModify.Private;
+                        phase = 200;
+                        parsed = true;
+                        break;
+                    case "#":
+                        pibot.accessModify = Pibot.AccessModify.Protected;
+                        phase = 200;
+                        parsed = true;
+                        break;
+                    case "# <<internal>>": // not working. FIXME: トークンにしたい
+                        pibot.accessModify = Pibot.AccessModify.ProtectedInternal;
+                        phase = 200;
+                        parsed = true;
+                        break;
                     case "+":
                         pibot.accessModify = Pibot.AccessModify.Public;
                         phase = 200;

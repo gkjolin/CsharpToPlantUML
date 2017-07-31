@@ -2,6 +2,9 @@
 
 namespace CsharpToPlantUml
 {
+    /// <summary>
+    /// 参考：「(補足) Roslyn で C#のソースコードからPlantUMLのクラス図を生成する の設計メモ」http://pierre3.hatenablog.com/entry/2015/09/11/234924
+    /// </summary>
     public class Pibot
     {
         public Pibot()
@@ -30,6 +33,16 @@ namespace CsharpToPlantUml
         /// 修飾子
         /// </summary>
         public bool isReadonly;
+
+        /// <summary>
+        /// 修飾子
+        /// </summary>
+        public bool isVirtual;
+
+        /// <summary>
+        /// 修飾子
+        /// </summary>
+        public bool isOverride;
 
         /// <summary>
         /// 要素名
@@ -73,6 +86,9 @@ namespace CsharpToPlantUml
         public enum AccessModify
         {
             Public,
+            Internal,
+            ProtectedInternal,
+            Protected,
             Private,
             Num
         }

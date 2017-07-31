@@ -141,7 +141,15 @@ namespace CsharpToPlantUml
             {
                 if (!startedSigunature)
                 {
-                    if (pibot.isStatic || pibot.isConst || pibot.isReadonly || pibot.accessModify != Pibot.AccessModify.Private || readType || readName)
+                    if (pibot.isStatic ||
+                        pibot.isConst ||
+                        pibot.isOverride ||
+                        pibot.isReadonly ||
+                        pibot.isVirtual ||
+                        pibot.accessModify != Pibot.AccessModify.Private ||
+                        readType ||
+                        readName
+                        )
                     {
                         startedSigunature = true;
                     }
@@ -289,10 +297,16 @@ namespace CsharpToPlantUml
                                     {
                                         switch (token)
                                         {
-                                            case "static": pibot.isStatic = true; goto gt_next;
                                             case "const": pibot.isConst = true; goto gt_next;
-                                            case "readonly": pibot.isReadonly = true; goto gt_next;
+                                            case "internal": pibot.accessModify = Pibot.AccessModify.Internal; goto gt_next;
+                                            case "override": pibot.isOverride = true; goto gt_next;
+                                            case "private": pibot.accessModify = Pibot.AccessModify.Private; goto gt_next;
+                                            case "protected": pibot.accessModify = Pibot.AccessModify.Protected; goto gt_next;
+                                            case "protected internal": pibot.accessModify = Pibot.AccessModify.ProtectedInternal; goto gt_next;// not working. FIXME: トークンにしたい
                                             case "public": pibot.accessModify = Pibot.AccessModify.Public; goto gt_next;
+                                            case "readonly": pibot.isReadonly = true; goto gt_next;
+                                            case "static": pibot.isStatic = true; goto gt_next;
+                                            case "virtual": pibot.isVirtual = true; goto gt_next;
                                         }
                                         endMofify = true;
                                     }

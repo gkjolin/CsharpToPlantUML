@@ -20,7 +20,10 @@ namespace CsharpToPlantUml
             // アクセス修飾子
             switch (pibot.accessModify)
             {
+                case Pibot.AccessModify.Internal: sb.Append("<<internal>>"); break;
                 case Pibot.AccessModify.Private: sb.Append("- "); break;
+                case Pibot.AccessModify.Protected: sb.Append("# "); break;
+                case Pibot.AccessModify.ProtectedInternal: sb.Append("# <<internal>>"); break;
                 case Pibot.AccessModify.Public: sb.Append("+ "); break;
             }
             // 修飾子
@@ -31,7 +34,17 @@ namespace CsharpToPlantUml
             // 修飾子
             if (pibot.isReadonly)
             {
-                sb.Append("readonly ");
+                sb.Append("<<readonly>> ");
+            }
+            // 修飾子
+            if (pibot.isOverride)
+            {
+                sb.Append("<<override>> ");
+            }
+            // 修飾子
+            if (pibot.isVirtual)
+            {
+                sb.Append("<<virtual>> ");
             }
 
             bool writedColon = false;
