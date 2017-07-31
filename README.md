@@ -15,6 +15,7 @@ C#のコードを PlantUMLに変換したいぜ☆（＾～＾）！
 変換後
 
 ```
-{static} - score_cache; : Score : '<summary> スコアのスクリプトのキャッシュ </summary> '
+- score_cache : Score {static} 'スコアのスクリプトのキャッシュ'
 ```
 
+- ステレオタイプは型の後ろに付けます
