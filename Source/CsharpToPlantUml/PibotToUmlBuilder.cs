@@ -12,39 +12,18 @@ namespace CsharpToPlantUml
         {
             StringBuilder sb = new StringBuilder();
 
-            // 修飾子
-            if (pibot.isStatic)
-            {
-                sb.Append("{static} ");
-            }
-            // アクセス修飾子
+            // ****************************
+            // * アクセス修飾子（その１） *
+            // ****************************
+            //
+            // ステレオタイプはここでは付けません
+            // 名前の前にステレオタイプを付けると、インデントがぐちゃぐちゃになるんで、型の後ろに付けることにします
             switch (pibot.accessModify)
             {
-                case Pibot.AccessModify.Internal: sb.Append("<<internal>>"); break;
                 case Pibot.AccessModify.Private: sb.Append("- "); break;
                 case Pibot.AccessModify.Protected: sb.Append("# "); break;
-                case Pibot.AccessModify.ProtectedInternal: sb.Append("# <<internal>>"); break;
+                case Pibot.AccessModify.ProtectedInternal: sb.Append("# "); break;
                 case Pibot.AccessModify.Public: sb.Append("+ "); break;
-            }
-            // 修飾子
-            if (pibot.isConst)
-            {
-                sb.Append("const ");
-            }
-            // 修飾子
-            if (pibot.isReadonly)
-            {
-                sb.Append("<<readonly>> ");
-            }
-            // 修飾子
-            if (pibot.isOverride)
-            {
-                sb.Append("<<override>> ");
-            }
-            // 修飾子
-            if (pibot.isVirtual)
-            {
-                sb.Append("<<virtual>> ");
             }
 
             bool writedColon = false;
@@ -57,8 +36,8 @@ namespace CsharpToPlantUml
                 // 引数リスト
                 if (0 < pibot.argumentList.Length) { sb.Append(pibot.argumentList.ToString()); }
 
-                sb.Append(" : ");
-                writedColon = true;
+                //sb.Append(" : ");
+                //writedColon = true;
             }
             else
             {
@@ -74,6 +53,64 @@ namespace CsharpToPlantUml
                 sb.Append(pibot.type);
                 // ジェネリック型引数
                 if (0 < pibot.genericParameters.Length) { sb.Append(pibot.genericParameters.ToString()); }
+            }
+
+            // **********
+            // * 修飾子 *
+            // **********
+            //
+            // 名前の前にステレオタイプ等を付けると、インデントがぐちゃぐちゃになるんで、型の後ろに付けることにします
+            if (pibot.isStatic ||
+                pibot.isConst ||
+                pibot.isReadonly ||
+                pibot.isOverride ||
+                pibot.isVirtual ||
+                pibot.accessModify == Pibot.AccessModify.Internal ||
+                pibot.accessModify == Pibot.AccessModify.ProtectedInternal
+                )
+            {
+                if (!writedColon)
+                {
+                    sb.Append(" : UNKNOWN_TYPE");
+                    writedColon = true;
+                }
+
+                // ****************************
+                // * アクセス修飾子（その２） *
+                // ****************************
+                //
+                // 名前の前に付けると、インデントがぐちゃぐちゃになるんで、ステレオタイプは型の後ろに付けることにする
+                switch (pibot.accessModify)
+                {
+                    case Pibot.AccessModify.Internal: sb.Append(" <<internal>>"); break;
+                    case Pibot.AccessModify.ProtectedInternal: sb.Append(" <<internal>>"); break;
+                }
+
+                // 修飾子
+                if (pibot.isStatic)
+                {
+                    sb.Append(" {static}");
+                }
+                // 修飾子
+                if (pibot.isConst)
+                {
+                    sb.Append(" const");
+                }
+                // 修飾子
+                if (pibot.isReadonly)
+                {
+                    sb.Append(" <<readonly>>");
+                }
+                // 修飾子
+                if (pibot.isOverride)
+                {
+                    sb.Append(" <<override>>");
+                }
+                // 修飾子
+                if (pibot.isVirtual)
+                {
+                    sb.Append(" <<virtual>>");
+                }
             }
 
             if (0 < pibot.summaryComment.Length)

@@ -11,7 +11,7 @@ namespace UnitTestProject1
         /// 複数行サマリーコメント
         /// </summary>
         [TestMethod]
-        public void TestMultipleSummaryComment()
+        public void TestCommentSummaryMultiple()
         {
             string input = @"        /// <summary>
         /// サマリー・コメント１行目
@@ -20,7 +20,7 @@ namespace UnitTestProject1
         /// </summary>
         static Type propertyName;
 ";
-            string expected = @"{static} - propertyName : Type 'サマリー・コメント１行目 サマリー・コメント２行目 サマリー・コメント３行目'";
+            string expected = @"- propertyName : Type {static} 'サマリー・コメント１行目 サマリー・コメント２行目 サマリー・コメント３行目'";
 
             CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
             Pibot pibot = codeToPibotBuilder.Translate(input);
@@ -37,7 +37,7 @@ namespace UnitTestProject1
         /// </summary>
         static Type propertyName;
 ";
-            string expected = @"{static} - propertyName : Type 'サマリー・コメント'";
+            string expected = @"- propertyName : Type {static} 'サマリー・コメント'";
 
             CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
             Pibot pibot = codeToPibotBuilder.Translate(input);
@@ -47,7 +47,7 @@ namespace UnitTestProject1
         }
 
         [TestMethod]
-        public void TestPropertyGenericType()
+        public void TestPropertyGenerictype()
         {
             string input = @"        /// <summary>
         /// サマリー・コメント
@@ -64,7 +64,7 @@ namespace UnitTestProject1
         }
 
         [TestMethod]
-        public void TestConstProperty()
+        public void TestPropertyConst()
         {
             string input = @"        /// <summary>
         /// サマリー・コメント
@@ -72,7 +72,25 @@ namespace UnitTestProject1
         const string CONST_STRING_NAME = ""This is a value."";
 
 ";
-            string expected = @"- const CONST_STRING_NAME : string 'サマリー・コメント'";
+            string expected = @"- CONST_STRING_NAME : string const 'サマリー・コメント'";
+
+            CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
+            Pibot pibot = codeToPibotBuilder.Translate(input);
+            string output = new PibotToUmlBuilder().Build(pibot);
+
+            Assert.AreEqual(expected: expected, actual: output);
+        }
+
+        [TestMethod]
+        public void TestPropertyReadonly()
+        {
+            string input = @"        /// <summary>
+        /// サマリー・コメント
+        /// </summary>
+        readonly string CONST_STRING_NAME = ""This is a value."";
+
+";
+            string expected = @"- CONST_STRING_NAME : string <<readonly>> 'サマリー・コメント'";
 
             CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
             Pibot pibot = codeToPibotBuilder.Translate(input);
@@ -85,7 +103,7 @@ namespace UnitTestProject1
         /// アトリビュートを無視
         /// </summary>
         [TestMethod]
-        public void TestConstPropertyIgnoreAttribute()
+        public void TestPropertyConstIgnoreAttribute()
         {
             string input = @"        /// <summary>
         /// サマリー・コメント
@@ -130,7 +148,7 @@ namespace UnitTestProject1
         /// <returns></returns>
         public static Type MethodName()
 ";
-            string expected = @"{static} + MethodName() : Type 'サマリー・コメント'";
+            string expected = @"+ MethodName() : Type {static} 'サマリー・コメント'";
 
             CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
             Pibot pibot = codeToPibotBuilder.Translate(input);
@@ -151,7 +169,7 @@ namespace UnitTestProject1
         /// <returns></returns>
         public static Type MethodName(int a,int b)
 ";
-            string expected = @"{static} + MethodName(int a,int b) : Type 'サマリー・コメント'";
+            string expected = @"+ MethodName(int a,int b) : Type {static} 'サマリー・コメント'";
 
             CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
             Pibot pibot = codeToPibotBuilder.Translate(input);
