@@ -53,6 +53,8 @@ namespace CsharpToPlantUml
                 sb.Append(pibot.type);
                 // ジェネリック型引数
                 if (0 < pibot.genericParameters.Length) { sb.Append(pibot.genericParameters.ToString()); }
+                // 配列のブラケット
+                if (0 < pibot.arrayBrackets.Length) { sb.Append(pibot.arrayBrackets.ToString()); }
             }
 
             // **********

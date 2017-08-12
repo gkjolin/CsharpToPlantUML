@@ -338,6 +338,14 @@ namespace CsharpToPlantUml
                                         pibot.genericParameters.Append(token);
                                         depthOfOpendAngleBracket--;
                                     }
+                                    else if ("[" == token)
+                                    {
+                                        pibot.arrayBrackets.Append(token);
+                                    }
+                                    else if ("]" == token)
+                                    {
+                                        pibot.arrayBrackets.Append(token);
+                                    }
                                     else if (!readName)
                                     {
                                         pibot.name = token;

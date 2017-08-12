@@ -47,6 +47,40 @@ namespace UnitTestProject1
         }
 
         [TestMethod]
+        public void TestPropertyArray()
+        {
+            string input = @"        /// <summary>
+        /// サマリー・コメント
+        /// </summary>
+        Type[] propertyName;
+";
+            string expected = @"- propertyName : Type[] 'サマリー・コメント'";
+
+            CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
+            Pibot pibot = codeToPibotBuilder.Translate(input);
+            string output = new PibotToUmlBuilder().Build(pibot);
+
+            Assert.AreEqual(expected: expected, actual: output);
+        }
+
+        [TestMethod]
+        public void TestPropertyArrayArray()
+        {
+            string input = @"        /// <summary>
+        /// サマリー・コメント
+        /// </summary>
+        Type[][] propertyName;
+";
+            string expected = @"- propertyName : Type[][] 'サマリー・コメント'";
+
+            CodeToPibotBuilder codeToPibotBuilder = new CodeToPibotBuilder();
+            Pibot pibot = codeToPibotBuilder.Translate(input);
+            string output = new PibotToUmlBuilder().Build(pibot);
+
+            Assert.AreEqual(expected: expected, actual: output);
+        }
+
+        [TestMethod]
         public void TestPropertyGenerictype()
         {
             string input = @"        /// <summary>

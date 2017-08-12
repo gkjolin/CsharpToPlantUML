@@ -13,6 +13,7 @@ namespace CsharpToPlantUml
             accessModify = AccessModify.Private;
             name = "";
             type = "";
+            arrayBrackets = new StringBuilder();
             genericParameters = new StringBuilder();
             argumentList = new StringBuilder();
             documentComment = new StringBuilder();
@@ -53,6 +54,12 @@ namespace CsharpToPlantUml
         /// 型名
         /// </summary>
         public string type;
+
+        /// <summary>
+        /// 配列のブラケット
+        /// 例：「[][]」
+        /// </summary>
+        public StringBuilder arrayBrackets;
 
         /// <summary>
         /// ジェネリック型引数
